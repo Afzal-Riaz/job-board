@@ -10,4 +10,10 @@ export default defineConfig({
         }),
         tailwindcss(),
     ],
+
+    // vite.config.js
+    server: {
+      cors: true,  // This allows cross-origin requests
+    },
+  
 });
