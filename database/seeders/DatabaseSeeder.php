@@ -6,6 +6,7 @@ use App\Models\Job;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\User;
 use App\Models\Employer;
+use App\Models\JobApplication;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -40,7 +41,19 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        // User::factory(10)->create();
+        
+        foreach($users as $user) {
+            $jobs = \App\Models\Job::inRandomOrder()->take(rand(0, 4))->get();
+
+            foreach($jobs as $job) {
+                JobApplication::factory()->create([
+                    'job_id' => $job->id,
+                    'user_id' => $user->id
+                ]);
+            }
+
+            
+        }
 
 
     }
