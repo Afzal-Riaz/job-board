@@ -2,21 +2,19 @@
 
 namespace App\Models;
 
-use App\Models\Employer;
-use App\Models\JobApplication;
 use Illuminate\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
 class Job extends Model
 {
-    /** @use HasFactory<\Database\Factories\JobFactory> */
-    use HasFactory; 
+    use HasFactory;
 
+    protected $table = 'offered_jobs';
     protected $fillable = [
         'title',
         'location',
@@ -26,14 +24,11 @@ class Job extends Model
         'category'
     ];
 
-    protected $table = 'offered_jobs';
-
     public static array $experience = ['entry', 'intermediate', 'senior'];
-
     public static array $category = [
-        'IT', 
-        'Finance', 
-        'Sales', 
+        'IT',
+        'Finance',
+        'Sales',
         'Marketing'
     ];
 
@@ -52,19 +47,19 @@ class Job extends Model
         return $this->where('id', $this->id)
             ->whereHas(
                 'jobApplications',
-                fn($query) => $query->where('user_id',  '=', $user->id ?? $user)
+                fn($query) => $query->where('user_id', '=', $user->id ?? $user)
             )->exists();
     }
 
-    public function scopeFilter(Builder|QueryBuilder $query, array $filters)
+    public function scopeFilter(Builder|QueryBuilder $query, array $filters): Builder|QueryBuilder
     {
         return $query->when($filters['search'] ?? null, function ($query, $search) {
             $query->where(function ($query) use ($search) {
                 $query->where('title', 'like', '%' . $search . '%')
-                ->orWhere('description', 'like', '%' . $search . '%' )
-                ->orwhereHas('employer', function ($query) use ($search) {
-                    $query->where('company_name', 'like', '%' . $search . '%' );
-                });
+                    ->orWhere('description', 'like', '%' . $search . '%')
+                    ->orWhereHas('employer', function ($query) use ($search) {
+                        $query->where('company_name', 'like', '%' . $search . '%');
+                    });
             });
         })->when($filters['min_salary'] ?? null, function ($query, $minSalary) {
             $query->where('salary', '>=', $minSalary);
@@ -76,7 +71,4 @@ class Job extends Model
             $query->where('category', $category);
         });
     }
-
 }
-
-
